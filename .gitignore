@@ -1,6 +1,6 @@
 # ignore idea files
-/idea/
+/.idea/
 # ignore virtualenv
 /venv/
-#ignore python cache
+# ignore python cache
 /__pycache__/
