@@ -1,8 +1,4 @@
-import socket
-import threading
 from threading import Thread
-
-from requests.packages import target
 
 import socket_mgr
 
@@ -15,4 +11,3 @@ server_ip = input('Enter server IP =>')
 
 Server_conn = socket_mgr.inicialize_connection(server_ip, server_port)
 recv = Thread(target=socket_mgr.recv(Server_conn)).start()
-

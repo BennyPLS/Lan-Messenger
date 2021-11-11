@@ -1,9 +1,6 @@
 import socket
 from threading import Thread
-import threading
 import socket_mgr
-import key_mgr
-import msg_mgr
 
 header = 64
 port = 5000
