@@ -5,3 +5,4 @@
 # ignore python cache
 /src/__pycache__/
 /src/RSA Sockets/__pycache__/
+/src/misc/__pycache__/
