@@ -8,5 +8,6 @@ serverip = socket.gethostbyname(socket.gethostname())
 
 server = socket_mgr.inicialize_server(serverip, port)
 
-listenThread = Thread(target=socket_mgr.listen(server)).start()
-
+listenThread = Thread(target=socket_mgr.listen(server))
+listenThread.start()
+ClientBase = []

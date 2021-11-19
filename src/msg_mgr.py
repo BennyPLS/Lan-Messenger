@@ -1,6 +1,7 @@
 from Crypto.Cipher import PKCS1_OAEP
 import binascii
 
+encode_format = 'utf8'
 
 ########################################
 #          Encrypt  function           #
@@ -8,18 +9,19 @@ import binascii
 
 
 def encrypt_msg(msg, key):
-    msg = msg.encode()
+    msg = msg.encode(encode_format)
     cipher = PKCS1_OAEP.new(key)
     msg = cipher.encrypt(msg)
     msg = binascii.hexlify(msg)
-
+    msg = str(msg)
+    msg = msg[2:-1]
     return msg
 
 
 def encrypt_file(filename, key):
     file = open(filename, 'rt')
     text = file.read()
-    text = text.encode()
+    text = text.encode(encode_format)
     cipher = PKCS1_OAEP.new(key)
     text = cipher.encrypt(text)
     file.close()
@@ -33,10 +35,10 @@ def encrypt_file(filename, key):
 
 
 def decrypt_msg(msg, key):
+    if msg is not bytes:
+        msg = bytes(msg, encode_format)
     msg = binascii.unhexlify(msg)
-    print(msg)
     msg = bytes(msg)
-    print(msg)
     cipher = PKCS1_OAEP.new(key)
     msg = cipher.decrypt(msg)
     msg = str(msg)

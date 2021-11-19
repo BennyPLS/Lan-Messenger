@@ -1,6 +1,5 @@
 import socket
 from threading import Thread
-import threading
 import msg_mgr
 import key_mgr
 
@@ -10,11 +9,10 @@ import key_mgr
 
 encode_format = 'utf8'
 header = 64
-disconection_message = '!DISCONNECT'
-timeoutmsg = ['!TIMEOUT', '!TIMEOUTRESPONSE']
-userDict = {}
+disconnection_message = '!DISCONNECT'
+userDict = {}  # { usuername:[addr, conn, public_key] }
+connDict = {}
 pubkeyDict = {}
-prikeyDict = {}
 server_private_key = None
 server_public_key = None
 
@@ -29,7 +27,7 @@ def recv(conn: socket):
             msg_length = conn.recv(header).decode(encode_format)
         except ConnectionResetError:
             print('[CLOSED CONNECTION BY SERVER]')
-            break
+            return ConnectionResetError
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(encode_format)
@@ -39,7 +37,7 @@ def recv(conn: socket):
 
 def send(msg: str, conn: socket, rsa_key=None):
     if rsa_key:
-        msg_mgr.encrypt_msg(msg, rsa_key)
+        msg = msg_mgr.encrypt_msg(msg, rsa_key)
 
     msg = msg.encode(encode_format)
     msg_length = len(msg)
@@ -80,40 +78,39 @@ def listen(server: socket):
     server.listen()
     while True:
         client_conn, client_addr = server.accept()
-        thread = Thread(target=handle_connection, args=(client_conn, client_addr))
-        thread.start()
+        Thread(target=handle_connection, args=(client_conn, client_addr)).start()
 
 
 def handle_connection(conn: socket, addr):
     print(f'[NEW CONNECTION] {addr} connected')
 
     public_key = recv(conn)
-    pubkeyDict[addr] = key_mgr.unstringify_key(public_key)
+    public_key = key_mgr.unstringify_key(public_key)
 
     send(key_mgr.stringify_key(server_public_key), conn)
 
     username = recv(conn)
-    userDict[addr] = username
+    userDict[username] = [addr, conn, public_key]
 
     connected = True
 
-    while connected:
-        msg_length = None
-        try:
-            msg_length = conn.recv(header).decode(encode_format)
-        except ConnectionResetError:
-            userDict.pop(addr)
-            print(f'[FORCE CLOSED CONNECTION] {addr}')
-            exit()
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode(encode_format)
+    # Recv Handler #
 
-            if msg == disconection_message:
-                connected = False
-                print(f'{userDict[addr]} has disconnected')
-            else:
-                print(f'{userDict[addr]} > {msg}')
+    while connected:
+        msg = recv(conn)
+        if msg is ConnectionResetError:
+            connected = False
+            print(f'{username} has disconnected')
+
+        if msg is False:
+            continue
+        msg = msg_mgr.decrypt_msg(msg, server_private_key)
+
+        if msg == disconnection_message:
+            connected = False
+            print(f'{username} has disconnected')
+
+        print(f'{username} > {msg}')
 
     conn.close()
 
@@ -140,6 +137,9 @@ def inicialize_connection(ip, port):
           f'Port : {port}   \n'
           f'###############################')
 
+    # Interchange of information #
+    # public keys, usernames #
+
     send(key_mgr.stringify_key(public_key), conn)
 
     public_key_server = recv(conn)
@@ -157,6 +157,29 @@ def handle_recv_client(conn, private_key):
     while True:
         msg = recv(conn)
 
-        msg_mgr.decrypt_msg(msg, private_key)
+        msg = msg_mgr.decrypt_msg(msg, private_key)
 
-        print(msg)
+        print(f'Server send > {msg}')
+
+
+########################################
+#       miscellaneous  functions       #
+########################################
+
+def search_public_key_by_username(username):
+    usuername_info = userDict[username]
+    if usuername_info:
+        if usuername_info:
+            public_key = usuername_info[2]
+            return public_key
+    else:
+        print('No information available found liked to that username')
+
+
+def search_conn_by_username(username):
+    usuername_info = userDict[username]
+    if usuername_info:
+        conn = usuername_info[1]
+        return conn
+    else:
+        print('No information available found liked to that username')
