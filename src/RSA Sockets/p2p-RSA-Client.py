@@ -1,15 +1,21 @@
 import key_mgr
 import socket_mgr
-from switch import Switch
+import client_mgr
+import server_mgr
 from threading import Thread
+import threading
+
+# from misc.reg_logger import reg_logger
+# from misc.UserClass import User
 
 
 def main():
     # Variables #
-    server_ip = None
+
     server = None
-    server_port = None
-    conn_port = None
+    server_thread = None
+    conn = None
+    public_key_server = None
 
     print('''
     ########################################
@@ -19,22 +25,24 @@ def main():
     while True:
         entry = input(" =>")
 
-        with Switch(entry.lower()) as case:
-            if case('inicialize server', 'init server'):
+        match entry.lower():
+            case 'initialize server' | 'init server':
                 server_ip = input('Input Server IP address: ')
                 server_port = input('Input port number: ')
                 try:
                     server_port = int(server_port)
                     if server_port < 0 or server_port is False:
                         raise ValueError
+                    if server_port <= 49151:
+                        print('WARNING: You may be using a port in use or reserved')
+                    server, server_private_key = server_mgr.initialize_server(server_ip, server_port)
+                    if server:
+                        server_thread = Thread(target=server_mgr.listen, args=[server])
+                        server_thread.start()
                 except ValueError:
                     print('The port has to be a positive integer')
-                if server_port <= 49151:
-                    print('WARNING: You may be using a port in use or reserved')
-                server, server_private_key = socket_mgr.inicialize_server(server_ip, server_port)
-                if server:
-                    Thread(target=socket_mgr.listen, args=[server]).start()
-            if case('connect', 'conn', 'connect to server'):
+
+            case 'connect' | 'conn' | 'connect to server':
                 conn_ip = input('Input IP address: ')
                 conn_port = input('Input port number: ')
                 try:
@@ -44,29 +52,39 @@ def main():
                 except ValueError:
                     print('The port has to be a positive integer')
 
-                conn, username, conn_private_key, public_key_server = socket_mgr.inicialize_connection(conn_ip,
+                conn, username, conn_private_key, public_key_server = client_mgr.inicialize_connection(conn_ip,
                                                                                                        conn_port)
                 public_key_server = key_mgr.unstringify_key(public_key_server)
-            if case('send msg to server', 'sms'):
+
+            case 'send msg to server' | 'sms':
                 if conn:
                     msg = input('Input Message: ')
 
                     socket_mgr.send(msg, conn, public_key_server)
                 else:
                     print('No active connections')
-            if case('stop server', 'close server'):
+
+            case 'stop server' | 'close server':
                 if server:
                     try:
                         server.close()
                     except OSError:
                         print('Server Closed [FORCED]')
-            if case('send msg to a client', 'smc'):
+
+            case 'send msg to a client' | 'smc':
                 username = input('Input the username: ')
-                pubkey_client = socket_mgr.search_public_key_by_username(username)
-                conn = socket_mgr.search_conn_by_username(username)
+                pubkey_client = server_mgr.search_public_key_by_username(username)
+                conn = server_mgr.search_conn_by_username(username)
                 msg = input('Input Message: ')
                 socket_mgr.send(msg, conn, pubkey_client)
-            if case.default:
+
+            case 'threads':
+                print(threading.active_count())
+
+            case 'exit':
+                exit()
+
+            case _:
                 print('No valid option found')
 
 

@@ -19,14 +19,14 @@ def encrypt_msg(msg, key):
 
 
 def encrypt_file(filename, key):
-    file = open(filename, 'rt')
-    text = file.read()
-    text = text.encode(encode_format)
-    cipher = PKCS1_OAEP.new(key)
-    text = cipher.encrypt(text)
-    file.close()
-    file = open(filename, 'wb')
-    file.write(text)
+    with open(filename, 'rt') as f:
+        text = f.read()
+        text = text.encode(encode_format)
+        cipher = PKCS1_OAEP.new(key)
+        text = cipher.encrypt(text)
+
+    with open(filename, 'wb') as f:
+        f.write(text)
 
 
 ########################################
@@ -47,13 +47,13 @@ def decrypt_msg(msg, key):
 
 
 def decrypt_file(filename, key):
-    file = open(filename, 'rb')
-    text = file.read()
-    cipher = PKCS1_OAEP.new(key)
-    text = cipher.decrypt(text)
-    text = str(text)
-    file.close()
-    file = open(filename, 'wt')
-    text = str(text)
-    text = text[2:-1]
-    file.write(text)
+    with open(filename, 'rb') as f:
+        text = f.read()
+        cipher = PKCS1_OAEP.new(key)
+        text = cipher.decrypt(text)
+        text = str(text)
+
+    with open(filename, 'wt') as f:
+        text = str(text)
+        text = text[2:-1]
+        f.write(text)

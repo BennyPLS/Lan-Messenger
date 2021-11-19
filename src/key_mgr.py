@@ -47,7 +47,7 @@ def export_key_to_file(key, filename):
 ########################################
 
 def unstringify_key(key):
-    # Importacion de 'RSA keys' ( String Key --> RSA object(key) )
+    # Import of 'RSA keys' ( String Key --> RSA object(key) )
     key = RSA.importKey(binascii.unhexlify(key))
 
     return key
