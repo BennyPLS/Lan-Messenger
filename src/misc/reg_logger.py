@@ -1,19 +1,34 @@
 import logging
 import chromalog
+# noinspection PyUnresolvedReferences
+from chromalog.mark.helpers.simple import success, error, important
 
-format_logger = ('[%(asctime)s] - [File:%(filename)s -> FuncName:%(funcName)s -> ThreadName:%(threadName)s]\n'
-                 'LOGGER:%(name)s - %(levelname)s: %(message)s')
+########################################
+#           global variables           #
+########################################
+
+default_format_logger = ('\n[%(asctime)s] - [File:%(filename)s -> FuncName:%(funcName)s -> ThreadName:%(threadName)s]\n'
+                         'LOGGER:%(name)s - %(levelname)s: %(message)s')
 
 
-def reg_logger(name, level=logging.INFO, format_msg=format_logger, filename=None, stream_handler=True):
+########################################
+#               functions              #
+########################################
+
+def reg_logger(
+        name: str,
+        level: int = logging.INFO,
+        format_msg: str = default_format_logger,
+        filename=None,
+        stream_handler: bool = True
+):
+    """This creates a logger with the given parameters
+    name, Name of the logger,
+    level, the levels that we shows """
     logger = logging.getLogger(name)
     logger.setLevel(level)
     if stream_handler:
-        stream_handler = logging.StreamHandler()
-        if format_msg:
-            formatter = logging.Formatter(format_msg)
-            stream_handler.setFormatter(formatter)
-        logger.addHandler(stream_handler)
+        chromalog.basicConfig(default_format_logger)
     if filename:
         file_handler = logging.FileHandler(filename)
         if format_msg:
@@ -22,15 +37,3 @@ def reg_logger(name, level=logging.INFO, format_msg=format_logger, filename=None
         logger.addHandler(file_handler)
 
     return logger
-
-
-if __name__ == '__main__':
-    # logger = reg_logger(__name__)
-    # chromalog.basicConfig(level=logging.DEBUG)
-    # logger = logging.getLogger()
-    # logger.debug("This is a debug message")
-    # logger.info("This is an info message")
-    # logger.warning("This is a warning message")
-    # logger.error("This is an error message")
-    # logger.critical("This is a critical message")
-    input()

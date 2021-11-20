@@ -2,8 +2,9 @@ import key_mgr
 import msg_mgr
 import socket
 from misc.reg_logger import reg_logger
+from misc.UserClass import User
 from threading import Thread
-from socket_mgr import recv, send
+from src.rsa_sockets.socket_mgr import recv, send
 
 
 ########################################
@@ -11,8 +12,6 @@ from socket_mgr import recv, send
 ########################################
 
 logger = reg_logger(__name__)
-logger.info('puta')
-
 
 ########################################
 #              Server Var              #
@@ -48,7 +47,8 @@ def initialize_server(ip, port):
           f'Port : {port}   \n'
           f'###############################')
 
-    return server, server_private_key
+    server_thread = Thread(target=listen, args=[server])
+    return server, server_private_key, server_thread
 
 
 def listen(server: socket):
@@ -56,12 +56,14 @@ def listen(server: socket):
     while True:
         try:
             client_conn, client_addr = server.accept()
+            # noinspection PyUnusedLocal
             client = Thread(target=handle_connection, args=(client_conn, client_addr)).start()
         except OSError:
             print('Server Closed [FORCED]')
             break
 
 
+# noinspection PyTypeChecker
 def handle_connection(conn: socket, addr):
     logger.info(f'[NEW CONNECTION] {addr} connected')
 
@@ -71,6 +73,7 @@ def handle_connection(conn: socket, addr):
     send(key_mgr.stringify_key(server_public_key), conn)
 
     username = recv(conn)
+    userDict[username] = User(username, addr, conn, public_key)
     userDict[username] = [addr, conn, public_key]
 
     connected = True
@@ -104,18 +107,23 @@ def search_public_key_by_username(username):
     try:
         username_info = userDict[username]
         if username_info:
-            public_key = username_info[2]
+            public_key = username_info.public_key
             return public_key
         else:
             print('No information available found liked to that username')
+
     except KeyError:
         print('There are not a user in the database with that username')
 
 
 def search_conn_by_username(username):
-    username_info = userDict[username]
-    if username_info:
-        conn = username_info[1]
-        return conn
-    else:
-        print('No information available found liked to that username')
+    try:
+        username_info = userDict[username]
+        if username_info:
+            conn = username_info.conn
+            return conn
+        else:
+            print('No information available found liked to that username')
+
+    except KeyError:
+        print('There are not a user in the database with that username')

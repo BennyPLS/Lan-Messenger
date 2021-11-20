@@ -1,7 +1,8 @@
 import socket
 from threading import Thread
-import msg_mgr, key_mgr
-from socket_mgr import recv, send
+import key_mgr
+import msg_mgr
+from src.rsa_sockets.socket_mgr import recv, send
 
 
 ########################################

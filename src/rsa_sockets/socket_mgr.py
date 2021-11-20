@@ -1,7 +1,5 @@
 import socket
-from threading import Thread
 import msg_mgr
-import key_mgr
 
 ########################################
 #    Standard Var  global functions    #
