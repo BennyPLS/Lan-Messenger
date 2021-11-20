@@ -5,8 +5,14 @@ import server_mgr
 from threading import Thread
 import threading
 
-# from misc.reg_logger import reg_logger
+from misc.reg_logger import reg_logger
 # from misc.UserClass import User
+
+########################################
+#                Logging               #
+########################################
+
+logger = reg_logger(__name__, color=True)
 
 
 def main():
@@ -34,11 +40,12 @@ def main():
                     if server_port < 0 or server_port is False:
                         raise ValueError
                     if server_port <= 49151:
-                        print('WARNING: You may be using a port in use or reserved')
+                        logger.debug('You may be using a prot in use or reserved')
                     server, server_private_key = server_mgr.initialize_server(server_ip, server_port)
                     if server:
                         server_thread = Thread(target=server_mgr.listen, args=[server])
                         server_thread.start()
+                        logger.info('Server initialized')
                 except ValueError:
                     print('The port has to be a positive integer')
 
@@ -49,12 +56,12 @@ def main():
                     conn_port = int(conn_port)
                     if conn_port < 0 or conn_port is False:
                         raise ValueError
+                    conn, username, conn_private_key, public_key_server = client_mgr.inicialize_connection(conn_ip,
+                                                                                                           conn_port)
+                    logger.info('Successfully established connection')
+                    public_key_server = key_mgr.unstringify_key(public_key_server)
                 except ValueError:
                     print('The port has to be a positive integer')
-
-                conn, username, conn_private_key, public_key_server = client_mgr.inicialize_connection(conn_ip,
-                                                                                                       conn_port)
-                public_key_server = key_mgr.unstringify_key(public_key_server)
 
             case 'send msg to server' | 'sms':
                 if conn:
