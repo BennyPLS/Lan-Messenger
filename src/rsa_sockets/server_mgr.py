@@ -28,6 +28,10 @@ server_public_key = None
 ########################################
 
 def initialize_server(ip, port):
+    """This function initializes the server,
+    Binds de Ip and the port for preparation of the start of {listen} function,
+    Creates the server private key,
+    Initializes the Thread of {listen} function."""
     global server_private_key, server_public_key
     address = (ip, port)
 
@@ -52,6 +56,7 @@ def initialize_server(ip, port):
 
 
 def listen(server: socket):
+    """This function wait for income connection and redirects them to the {handle_connection} function"""
     server.listen()
     while True:
         try:
@@ -65,6 +70,8 @@ def listen(server: socket):
 
 # noinspection PyTypeChecker
 def handle_connection(conn: socket, addr):
+    """This function is the handler of an incoming connection to the server,
+    this make the neccesary interchange of info """
     logger.info(f'[NEW CONNECTION] {addr} connected')
 
     public_key = recv(conn)
@@ -104,6 +111,7 @@ def handle_connection(conn: socket, addr):
 ########################################
 
 def search_public_key_by_username(username):
+    """This function search the public key of a user, by username"""
     try:
         username_info = userDict[username]
         if username_info:
@@ -117,6 +125,7 @@ def search_public_key_by_username(username):
 
 
 def search_conn_by_username(username):
+    """This function search the conn; socket of a user, by username"""
     try:
         username_info = userDict[username]
         if username_info:

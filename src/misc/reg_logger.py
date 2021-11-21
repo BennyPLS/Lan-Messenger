@@ -1,7 +1,5 @@
 import logging
 import chromalog
-# noinspection PyUnresolvedReferences
-from chromalog.mark.helpers.simple import success, error, important
 
 ########################################
 #           global variables           #

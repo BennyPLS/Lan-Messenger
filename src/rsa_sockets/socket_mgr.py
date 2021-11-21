@@ -1,4 +1,5 @@
 import socket
+from Crypto.PublicKey import RSA
 import msg_mgr
 
 ########################################
@@ -7,12 +8,6 @@ import msg_mgr
 
 encode_format = 'utf8'
 header = 64
-disconnection_message = '!DISCONNECT'
-userDict = {}  # { usuername:[addr, conn, public_key] }
-connDict = {}
-pubkeyDict = {}
-server_private_key = None
-server_public_key = None
 
 
 ########################################
@@ -20,6 +15,7 @@ server_public_key = None
 ########################################
 
 def recv(conn: socket):
+    """This function handles the recieved data, with the headers of the messages."""
     while True:
         try:
             msg_length = conn.recv(header).decode(encode_format)
@@ -33,7 +29,8 @@ def recv(conn: socket):
             return msg
 
 
-def send(msg: str, conn: socket, rsa_key=None):
+def send(msg: str, conn: socket, rsa_key: RSA.RsaKey = None):
+    """This function handles all the preparation for the message to be sent"""
     if rsa_key:
         msg = msg_mgr.encrypt_msg(msg, rsa_key)
 

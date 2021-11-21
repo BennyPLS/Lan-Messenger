@@ -1,5 +1,4 @@
 import threading
-
 from misc.reg_logger import reg_logger
 from src import key_mgr
 from src.rsa_sockets import server_mgr, client_mgr, socket_mgr
