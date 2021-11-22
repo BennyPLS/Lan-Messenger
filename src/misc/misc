@@ -1,5 +1,0 @@
-def split_by_number(string: str, number: int):
-    """Gets a number and splits for x character counter"""
-    string = [string[x:x + number]
-              for x in range(0, len(string), number)]
-    return string

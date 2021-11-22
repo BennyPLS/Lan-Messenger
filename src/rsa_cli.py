@@ -1,3 +1,5 @@
+import logging
+
 import key_mgr
 import msg_mgr
 
@@ -16,80 +18,120 @@ def main():
         entry = input(" =>")
 
         match entry.lower():
-            case ('encrypt'):
+            case 'encrypt':
                 print("Encrypt file or text input?")
-                selection = input('=>')
-                if selection == 'file':
-                    msg_mgr.encrypt_file(input('Path =>'), public_key)
-                elif selection == 'text':
-                    msg_encoded = msg_mgr.encrypt_msg(input('Enter msg =>'), public_key)
-                    print(msg_encoded)
+                match input('=> '):
 
-            case ('decrypt'):
+                    case 'file':
+                        msg_mgr.encrypt_file(input('Path =>'), public_key)
+
+                    case 'text':
+                        msg_encoded = msg_mgr.encrypt_msg(input('Enter msg =>'), public_key)
+                        print(msg_encoded)
+
+                    case _:
+                        print('Selection not valid.\n Returning to main menu...')
+
+            case 'decrypt':
                 print("Decrypt file or text input?")
-                selection = input('=>')
-                if selection == 'file':
-                    msg_mgr.decrypt_file(input('Path =>'), private_key)
-                elif selection == 'text':
-                    print('Warning : This function can give errors')
-                    msg = msg_mgr.decrypt_msg(input('Enter encrypted msg =>'), private_key)
-                    print(msg)
+                match input('=> '):
 
-            case ('generate private key', 'gprik'):
+                    case 'file':
+                        msg_mgr.decrypt_file(input('Path =>'), private_key)
+
+                    case 'text':
+                        msg = msg_mgr.decrypt_msg(input('Enter encrypted msg =>'), private_key)
+                        print(msg)
+
+                    case _:
+                        print('Selection not valid.\n Returning to main menu...')
+
+            case 'generate private key' | 'gprik':
                 private_key = key_mgr.gen_private_key()
 
-            case ('generate public key', 'gpubk'):
+            case 'generate public key' | 'gpubk':
                 if private_key is None:
                     print('Private key not found')
-                else:
-                    public_key = key_mgr.gen_public_key(private_key)
-            case ('import'):
-                print('Import from a file or a string?')
-                selection = input('=>')
-                if selection == 'string':
-                    print('Import as a private_key or public_key?')
-                    selection = input('=>')
-                    if selection == 'private_key':
-                        private_key = key_mgr.unstringify_key(input('=>'))
-                    elif selection == 'public_key':
-                        public_key = key_mgr.unstringify_key(input('=>'))
-                elif selection == 'file':
-                    print('Import as a private_key or public_key?')
-                    selection = input('=>')
-                    if selection == 'private_key':
-                        private_key = key_mgr.import_key_from_file(input('Location =>'))
-                    elif selection == 'public_key':
-                        public_key = key_mgr.import_key_from_file(input('Location =>'))
+                    continue
 
-            case ('import private key from file', 'import prik file'):
+                public_key = key_mgr.gen_public_key(private_key)
+
+            case 'import':
+                print('Import from a file or a string?')
+                match input('=>'):
+
+                    case 'string':
+                        print('Import as a private_key or public_key?')
+                        match input('=>'):
+
+                            case 'private_key':
+                                private_key = key_mgr.unstringify_key(input('=>'))
+
+                            case 'public_key':
+                                public_key = key_mgr.unstringify_key(input('=>'))
+
+                            case _:
+                                print('Selection not valid.\n Returning to main menu...')
+
+                    case 'file':
+                        print('Import as a private_key or public_key?')
+                        match input('=>'):
+
+                            case 'private_key':
+                                private_key = key_mgr.import_key_from_file(input('Location =>'))
+
+                            case 'public_key':
+                                public_key = key_mgr.import_key_from_file(input('Location =>'))
+
+                            case _:
+                                print('Selection not valid.\n Returning to main menu...')
+
+            case 'import key from file' | 'ikf':
                 file_directory = input('Input the complete file directory =>')
-                private_key = key_mgr.import_key_from_file(file_directory)
-            case ('import public key from file', 'import pubk file'):
-                file_directory = input('Input the complete file directory =>')
-                public_key = key_mgr.import_key_from_file(file_directory)
-            case ('import key from str', 'import key str'):
+                print('save import as private_key or public_key?')
+                match input('=>'):
+
+                    case 'private_key':
+                        private_key = key_mgr.import_key_from_file(file_directory)
+
+                    case 'public_key':
+                        public_key = key_mgr.import_key_from_file(file_directory)
+
+            case 'import key from str' | 'iks':
                 str_key_import = input('only Keys in a string = >')
                 print('save import as private_key or public_key?')
-                selection = input('=>')
-                if selection == 'private_key':
-                    private_key = key_mgr.unstringify_key(str_key_import)
-                elif selection == 'public_key':
-                    public_key = key_mgr.unstringify_key(str_key_import)
-                else:
-                    print('selection not valid.\n Returning to main menu...')
-            case ('export'):
+                match input('=>'):
+
+                    case 'private_key':
+                        private_key = key_mgr.unstringify_key(str_key_import)
+
+                    case 'public_key':
+                        public_key = key_mgr.unstringify_key(str_key_import)
+
+                    case _:
+                        print('Selection not valid.\n Returning to main menu...')
+
+            case 'export':
                 print('Export Public key or Private key')
-                selection = input('=>')
-                if selection == 'private_key' or selection == 'private':
-                    key_mgr.export_key_to_file(private_key, input('Input the complete file directory =>'))
-                if selection == 'public_key' or selection == 'public':
-                    key_mgr.export_key_to_file(public_key, input('Input the complete file directory =>'))
-            case ('print private_key'):
+                match input('=>'):
+
+                    case 'private_key' | 'private':
+                        key_mgr.export_key_to_file(private_key, input('Input the complete file directory =>'))
+
+                    case 'public_key' | 'public':
+                        key_mgr.export_key_to_file(public_key, input('Input the complete file directory =>'))
+
+                    case _:
+                        print('Selection not valid.\n Returning to main menu...')
+
+            case 'print private_key':
                 print(key_mgr.stringify_key(private_key))
-            case ('print public_key'):
+
+            case 'print public_key':
                 print(key_mgr.stringify_key(public_key))
+
             case _:
-                print('option not found')
+                print('Selection not valid.\n Returning to main menu...')
 
 
 if __name__ == '__main__':

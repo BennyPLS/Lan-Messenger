@@ -1,8 +1,16 @@
 # ignore idea files
 /.idea/
+
 # ignore virtualenv
 /venv/
+
 # ignore python cache
 /src/__pycache__/
 /src/rsa_sockets/__pycache__/
 /src/misc/__pycache__/
+
+# ignore logs files
+/src/logs
+/src/misc/logs
+/scr/rsa_sockets/logs
+/scr/rsa_sockets/p2p_rsa_sockets/logs

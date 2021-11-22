@@ -71,7 +71,7 @@ def listen(server: socket):
 # noinspection PyTypeChecker
 def handle_connection(conn: socket, addr):
     """This function is the handler of an incoming connection to the server,
-    this make the neccesary interchange of info """
+    this make the neccesary interchange of info to stablish a encrypted connection"""
     logger.info(f'[NEW CONNECTION] {addr} connected')
 
     public_key = recv(conn)
