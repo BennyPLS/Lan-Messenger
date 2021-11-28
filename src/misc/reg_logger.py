@@ -17,7 +17,7 @@ def reg_logger(
         name: str,
         level: int = logging.INFO,
         format_msg: str = default_format_logger,
-        filename='./logs',
+        filename='./logs.log',
         stream_handler: bool = True
 ):
     """This creates a logger with the given parameters

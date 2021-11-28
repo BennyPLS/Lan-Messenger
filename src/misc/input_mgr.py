@@ -20,15 +20,12 @@ def input_ip():
     if is correct and return the processed input
     if not try again"""
     print('Input a ip with this format {x.x.x.x} \n'
-          '(Note : Without the keys) \n'
-          '=> ')
+          '(Note : Without the keys) ', end="")
     while True:
         ip = input('=> ')
 
-        ip = ip.replace(".", ":")
-
-        if re.search(r".?.?.?:.?.?.?:.?.?.?:.?.?.?$", ip):
-            list_ip_sections = ip.split(":")
+        if re.search(r"\d{1,4}[.]\d{1,4}[.]\d{1,4}[.]\d{1,4}", ip.strip()):
+            list_ip_sections = ip.split(".")
         else:
             logger.warning(f"The introduced ip, {ip}, it was not in the required format")
             continue
@@ -42,7 +39,7 @@ def input_ip():
 
 
 def input_port():
-    """This function takes the input from the usser and processed it
+    """This function takes the input from the user and processed it
     to confirm that the input of the user is a valid port
     if the port is non ephemeral, register a debug log"""
     while True:
@@ -62,4 +59,3 @@ def input_port():
             logger.error('The port has to be a positive integer')
         except IndexError:
             logger.error('You exceeded the maximum possible port numbers')
-

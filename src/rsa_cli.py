@@ -1,7 +1,4 @@
-import logging
-
-import key_mgr
-import msg_mgr
+from rsa import key_mgr, encrypt_decrypt_mgr
 
 
 def main():
@@ -23,10 +20,10 @@ def main():
                 match input('=> '):
 
                     case 'file':
-                        msg_mgr.encrypt_file(input('Path =>'), public_key)
+                        encrypt_decrypt_mgr.encrypt_file(input('Path =>'), public_key)
 
                     case 'text':
-                        msg_encoded = msg_mgr.encrypt_msg(input('Enter msg =>'), public_key)
+                        msg_encoded = encrypt_decrypt_mgr.encrypt_msg(input('Enter msg =>'), public_key)
                         print(msg_encoded)
 
                     case _:
@@ -37,10 +34,10 @@ def main():
                 match input('=> '):
 
                     case 'file':
-                        msg_mgr.decrypt_file(input('Path =>'), private_key)
+                        encrypt_decrypt_mgr.decrypt_file(input('Path =>'), private_key)
 
                     case 'text':
-                        msg = msg_mgr.decrypt_msg(input('Enter encrypted msg =>'), private_key)
+                        msg = encrypt_decrypt_mgr.decrypt_msg(input('Enter encrypted msg =>'), private_key)
                         print(msg)
 
                     case _:
@@ -131,7 +128,7 @@ def main():
                 print(key_mgr.stringify_key(public_key))
 
             case _:
-                print('Selection not valid.\n Returning to main menu...')
+                print('Selection not valid.')
 
 
 if __name__ == '__main__':

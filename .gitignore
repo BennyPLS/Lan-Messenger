@@ -10,7 +10,7 @@
 /src/misc/__pycache__/
 
 # ignore logs files
-/src/logs
-/src/misc/logs
-/scr/rsa_sockets/logs
-/scr/rsa_sockets/p2p_rsa_sockets/logs
+/src/logs.log
+/src/misc/logs.log
+/scr/rsa_sockets/logs.log
+/scr/rsa_sockets/p2p_rsa_sockets/logs.log

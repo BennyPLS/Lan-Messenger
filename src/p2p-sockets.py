@@ -1,10 +1,8 @@
-import threading
-from misc.reg_logger import reg_logger
-from src import key_mgr
-from src.rsa_sockets import server_mgr, client_mgr, socket_mgr
-from src.rsa_sockets.rsa_p2p import input_mgr
-
-# from misc.UserClass import User
+import sys
+from src.misc.reg_logger import reg_logger
+from src.rsa import key_mgr
+from src.sockets import server_mgr, client_mgr, socket_mgr
+from src.misc import input_mgr
 
 ########################################
 #                Logging               #
@@ -29,21 +27,25 @@ def main():
         entry = input(" =>")
 
         match entry.lower():
+
             case 'initialize server' | 'init server':
-                if not server:
-                    server_ip = input_mgr.input_ip()
-                    server_port = input_mgr.input_port()
-                    server, server_private_key, server_thread = server_mgr.initialize_server(server_ip, server_port)
-                    if server:
-                        logger.info('Server initialized')
                 if server:
                     logger.info('Server already on')
+                else:
+                    server_ip = input_mgr.input_ip()
+                    server_port = input_mgr.input_port()
+                    server_name = input('Server name: ')
+                    server, server_private_key, server_thread = server_mgr.initialize_server(server_ip, server_port, server_name)
+                    if server:
+                        logger.info('Server initialized')
 
             case 'connect' | 'conn' | 'connect to server':
-                conn_ip = input_mgr.input_ip()
+                conn_ip = input('pito')
+                # conn_ip = input_mgr.input_ip()
                 conn_port = input_mgr.input_port()
-                conn, username, conn_private_key, public_key_server = client_mgr.inicialize_connection(conn_ip,
-                                                                                                       conn_port)
+                conn, username, server_name, conn_private_key, public_key_server = \
+                    client_mgr.initialize_connection(conn_ip, conn_port)
+
                 if conn:
                     logger.info('Successfully established connection')
                     public_key_server = key_mgr.unstringify_key(public_key_server)
@@ -70,11 +72,8 @@ def main():
                 msg = input('Input Message: ')
                 socket_mgr.send(msg, conn, pubkey_client)
 
-            case 'threads':
-                print(threading.active_count())
-
             case 'exit':
-                exit()
+                sys.exit()
 
             case _:
                 print('No valid option found')

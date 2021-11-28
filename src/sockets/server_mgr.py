@@ -1,11 +1,10 @@
-import key_mgr
-import msg_mgr
+from Crypto.PublicKey import RSA
+from src.rsa import key_mgr
 import socket
 from misc.reg_logger import reg_logger
 from misc.UserClass import User
 from threading import Thread
-from src.rsa_sockets.socket_mgr import recv, send
-
+from src.sockets.socket_mgr import recv, send
 
 ########################################
 #                Logging               #
@@ -27,7 +26,7 @@ server_public_key = None
 #           Server functions           #
 ########################################
 
-def initialize_server(ip, port):
+def initialize_server(ip: str, port: int, server_name: str):
     """This function initializes the server,
     Binds de Ip and the port for preparation of the start of {listen} function,
     Creates the server private key,
@@ -39,8 +38,8 @@ def initialize_server(ip, port):
     try:
         server.bind(address)
     except OSError:
-        logger.exception('Port in use or not available')
-        return None, None
+        logger.error('Port in use or not available')
+        return None, None, None
 
     server_private_key = key_mgr.gen_private_key()
     server_public_key = key_mgr.gen_public_key(server_private_key)
@@ -51,25 +50,25 @@ def initialize_server(ip, port):
           f'Port : {port}   \n'
           f'###############################')
 
-    server_thread = Thread(target=listen, args=[server])
+    server_thread = Thread(target=listen, args=[server, server_name])
     return server, server_private_key, server_thread
 
 
-def listen(server: socket):
+def listen(server: socket, server_name: str):
     """This function wait for income connection and redirects them to the {handle_connection} function"""
     server.listen()
     while True:
         try:
             client_conn, client_addr = server.accept()
             # noinspection PyUnusedLocal
-            client = Thread(target=handle_connection, args=(client_conn, client_addr)).start()
+            client = Thread(target=handle_connection, args=(client_conn, client_addr, server_name)).start()
         except OSError:
             print('Server Closed [FORCED]')
             break
 
 
 # noinspection PyTypeChecker
-def handle_connection(conn: socket, addr):
+def handle_connection(conn: socket, addr, server_name: str = 'Server'):
     """This function is the handler of an incoming connection to the server,
     this make the neccesary interchange of info to stablish a encrypted connection"""
     logger.info(f'[NEW CONNECTION] {addr} connected')
@@ -81,27 +80,41 @@ def handle_connection(conn: socket, addr):
 
     username = recv(conn)
     userDict[username] = User(username, addr, conn, public_key)
-    userDict[username] = [addr, conn, public_key]
 
+    send(server_name, conn)
+
+    p2p_recive_handler(conn, server_private_key, username)
+
+    # connected = True
+    # while connected:
+    #     msg = recv(conn)
+    #     if msg is ConnectionResetError:
+    #         connected = False
+    #         print(f'{username} has disconnected')
+    #
+    #     if msg is False:
+    #         continue
+    #     msg = msg_mgr.decrypt_msg(msg, server_private_key)
+    #
+    #     if msg == disconnection_message:
+    #         connected = False
+    #         print(f'{username} has disconnected')
+    #
+    #     print(f'{username} > {msg}')
+    #
+    # conn.close()
+
+
+def p2p_recive_handler(conn: socket, rsa_key: RSA.RsaKey, client_username: str):
     connected = True
-
-    # Receiving Handler #
-
     while connected:
-        msg = recv(conn)
-        if msg is ConnectionResetError:
-            connected = False
-            print(f'{username} has disconnected')
-
-        if msg is False:
-            continue
-        msg = msg_mgr.decrypt_msg(msg, server_private_key)
+        msg = recv(conn, rsa_key)
 
         if msg == disconnection_message:
             connected = False
-            print(f'{username} has disconnected')
+            print(f'{client_username} has disconnected')
 
-        print(f'{username} > {msg}')
+        print(f'{client_username} > {msg}')
 
     conn.close()
 

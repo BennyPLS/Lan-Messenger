@@ -52,7 +52,7 @@ def encrypt_file(filename: str or Path, key: RSA.RsaKey):
             f.write(text)
     
     except FileNotFoundError:
-        logger.exception(f"The {filename} doesn't exists")
+        logger.error(f"The {filename} doesn't exists")
 
 
 ########################################
@@ -61,14 +61,18 @@ def encrypt_file(filename: str or Path, key: RSA.RsaKey):
 
 
 def decrypt_msg(msg: str, key: RSA.RsaKey):
-    """THis function decrypts a str with the given key"""
+    """This function decrypts a str with the given key"""
     if msg is not bytes:
         msg = bytes(msg, encode_format)
 
     msg = binascii.unhexlify(msg)
     msg = bytes(msg)
     cipher = PKCS1_OAEP.new(key)
-    msg = cipher.decrypt(msg)
+    try:
+        msg = cipher.decrypt(msg)
+    except ValueError:
+        logger.error('Decrypt failed, possible incorrect key')
+        return None
     msg = str(msg)
     msg = msg[2:-1]
     return msg
@@ -95,4 +99,4 @@ def decrypt_file(filename: str or Path, key: RSA.RsaKey):
             f.write(text)
 
     except FileNotFoundError:
-        logger.exception(f"The {filename} doesn't exists")
+        logger.error(f"The {filename} doesn't exists")
