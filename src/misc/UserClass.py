@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 import socket
 from Crypto.PublicKey import RSA
 from dataclasses import dataclass

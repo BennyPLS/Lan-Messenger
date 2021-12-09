@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 from Crypto.PublicKey import RSA
 from src.rsa import key_mgr
 import socket
@@ -35,6 +39,8 @@ def initialize_server(ip: str, port: int, server_name: str):
     address = (ip, port)
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
     try:
         server.bind(address)
     except OSError:
@@ -50,13 +56,14 @@ def initialize_server(ip: str, port: int, server_name: str):
           f'Port : {port}   \n'
           f'###############################')
 
-    server_thread = Thread(target=listen, args=[server, server_name])
+    server_thread = Thread(target=listen, args=[server, server_name]).start()
     return server, server_private_key, server_thread
 
 
 def listen(server: socket, server_name: str):
     """This function wait for income connection and redirects them to the {handle_connection} function"""
     server.listen()
+    logger.info('Server listening...')
     while True:
         try:
             client_conn, client_addr = server.accept()

@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 from Crypto.Cipher import PKCS1_OAEP
 from pathlib import Path
 from Crypto.PublicKey import RSA

@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 import socket
 from threading import Thread
 from src.rsa import key_mgr

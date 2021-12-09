@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 import binascii
 from pathlib import Path
 from chromalog.mark.helpers import simple as sh

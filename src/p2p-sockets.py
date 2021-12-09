@@ -1,3 +1,7 @@
+########################################
+#                Imports               #
+########################################
+
 import sys
 from src.misc.reg_logger import reg_logger
 from src.rsa import key_mgr
@@ -35,13 +39,13 @@ def main():
                     server_ip = input_mgr.input_ip()
                     server_port = input_mgr.input_port()
                     server_name = input('Server name: ')
-                    server, server_private_key, server_thread = server_mgr.initialize_server(server_ip, server_port, server_name)
+                    server, server_private_key, server_thread = \
+                        server_mgr.initialize_server(server_ip, server_port, server_name)
                     if server:
                         logger.info('Server initialized')
 
             case 'connect' | 'conn' | 'connect to server':
-                conn_ip = input('pito')
-                # conn_ip = input_mgr.input_ip()
+                conn_ip = input_mgr.input_ip()
                 conn_port = input_mgr.input_port()
                 conn, username, server_name, conn_private_key, public_key_server = \
                     client_mgr.initialize_connection(conn_ip, conn_port)
