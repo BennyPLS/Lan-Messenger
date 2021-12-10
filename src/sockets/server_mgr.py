@@ -2,13 +2,15 @@
 #                Imports               #
 ########################################
 
-from Crypto.PublicKey import RSA
-from src.rsa import key_mgr
 import socket
-from misc.reg_logger import reg_logger
-from misc.UserClass import User
 from threading import Thread
-from src.sockets.socket_mgr import recv, send
+
+from Crypto.PublicKey import RSA
+
+from misc.UserClass import User
+from misc.reg_logger import reg_logger
+from rsa import key_mgr
+from sockets.socket_mgr import recv, send
 
 ########################################
 #                Logging               #

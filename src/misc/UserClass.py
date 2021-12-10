@@ -3,8 +3,9 @@
 ########################################
 
 import socket
-from Crypto.PublicKey import RSA
 from dataclasses import dataclass
+
+from Crypto.PublicKey import RSA
 
 
 @dataclass(frozen=True)

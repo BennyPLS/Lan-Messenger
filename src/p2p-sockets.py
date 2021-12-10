@@ -3,10 +3,11 @@
 ########################################
 
 import sys
-from src.misc.reg_logger import reg_logger
-from src.rsa import key_mgr
-from src.sockets import server_mgr, client_mgr, socket_mgr
-from src.misc import input_mgr
+
+from misc import input_mgr
+from misc.reg_logger import reg_logger
+from rsa import key_mgr
+from sockets import server_mgr, client_mgr, socket_mgr
 
 ########################################
 #                Logging               #

@@ -3,7 +3,8 @@
 ########################################
 
 import re  # regular expressions
-from src.misc.reg_logger import reg_logger
+
+from misc.reg_logger import reg_logger
 
 ########################################
 #                Logging               #

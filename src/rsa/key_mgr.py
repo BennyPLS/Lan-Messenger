@@ -4,10 +4,12 @@
 
 import binascii
 from pathlib import Path
-from chromalog.mark.helpers import simple as sh
-from src.misc.reg_logger import reg_logger
+
 import Crypto
 from Crypto.PublicKey import RSA
+from chromalog.mark.helpers import simple as sh
+
+from misc.reg_logger import reg_logger
 
 ########################################
 #                Logging               #

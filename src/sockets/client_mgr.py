@@ -4,10 +4,12 @@
 
 import socket
 from threading import Thread
-from src.rsa import key_mgr
+
 from Crypto.PublicKey import RSA
-from src.sockets.socket_mgr import recv, send
+
 from misc.reg_logger import reg_logger
+from rsa import key_mgr
+from sockets.socket_mgr import recv, send
 
 ########################################
 #                Logging               #

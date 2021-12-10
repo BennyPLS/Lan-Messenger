@@ -3,6 +3,7 @@
 ########################################
 
 import logging
+
 import chromalog
 
 ########################################
@@ -19,7 +20,7 @@ default_format_logger = ('\n[%(asctime)s] - [File:%(filename)s -> FuncName:%(fun
 
 def reg_logger(
         name: str,
-        level: int = logging.INFO,
+        level: int = logging.ERROR,
         format_msg: str = default_format_logger,
         filename='./logs.log',
         stream_handler: bool = True
