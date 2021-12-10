@@ -2,8 +2,6 @@
 #                Imports               #
 ########################################
 
-import sys
-
 from misc import input_mgr
 from misc.reg_logger import reg_logger
 from rsa import key_mgr
@@ -24,16 +22,35 @@ def main():
     public_key_server = None
 
     print('''
-########################################
-#          RSA Socket Client           #
-########################################
+    ########################################
+    #          RSA Socket Client           #
+    ########################################
     ''')
+    print('\nType help or -h for help.')
     while True:
         entry = input(" =>")
 
         match entry.lower():
 
-            case 'initialize server' | 'init server':
+            case 'help' | '-h':
+
+                print('##############################################################################################\n'
+                      'initialize server            -initserv   | '
+                      'Initializes the server with the given parameters\n'
+                      'connect                      -conn       | '
+                      'Try to connect to the specified server\n'
+                      'send msg to server           -sms        | '
+                      'Sends a msg to the connected server\n'
+                      'send msg to a client         -smc        | '
+                      'Sends a msg to a specified user connected to your server\n'
+                      'stop server                  -clserver   | '
+                      'Stop forcefully the socket server\n'
+                      'exit                         -e          | '
+                      'Exit the programa\n'
+                      '##############################################################################################\n'
+                      )
+
+            case 'initialize server' | '-initserv':
                 if server:
                     logger.info('Server already on')
                 else:
@@ -45,7 +62,7 @@ def main():
                     if server:
                         logger.info('Server initialized')
 
-            case 'connect' | 'conn' | 'connect to server':
+            case 'connect' | '-conn':
                 conn_ip = input_mgr.input_ip()
                 conn_port = input_mgr.input_port()
                 conn, username, server_name, conn_private_key, public_key_server = \
@@ -55,7 +72,7 @@ def main():
                     logger.info('Successfully established connection')
                     public_key_server = key_mgr.unstringify_key(public_key_server)
 
-            case 'send msg to server' | 'sms':
+            case 'send msg to server' | '-sms':
                 if conn:
                     msg = input('Input Message: ')
 
@@ -63,25 +80,26 @@ def main():
                 else:
                     print('No active connections')
 
-            case 'stop server' | 'close server':
-                if server:
-                    try:
-                        server.close()
-                    except OSError:
-                        print('Server Closed [FORCED]')
-
-            case 'send msg to a client' | 'smc':
+            case 'send msg to a client' | '-smc':
                 username = input('Input the username: ')
                 pubkey_client = server_mgr.search_public_key_by_username(username)
                 conn = server_mgr.search_conn_by_username(username)
                 msg = input('Input Message: ')
                 socket_mgr.send(msg, conn, pubkey_client)
 
-            case 'exit':
-                sys.exit()
+            case 'Stop Server' | '-clserver':
+                if server:
+                    try:
+                        server.close()
+                    except OSError:
+                        print('Server Closed [FORCED]')
+
+            case 'exit' | '-e':
+                exit()
 
             case _:
-                print('No valid option found')
+                print('No valid option found.\n'
+                      'Type help or -h for help.')
 
 
 if __name__ == '__main__':

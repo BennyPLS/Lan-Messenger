@@ -15,14 +15,41 @@ def main():
     #            RSA Cli Client            #
     ########################################
     """)
+    print('\nType help or -h for help.')
     while True:
-        entry = input(" =>")
+        entry = input(" => ")
 
         match entry.lower():
+            case 'help' | '-h':
+                print('##############################################################################################\n'
+                      'encrypt                          | '
+                      'encrypts a given file or string with the public key stored\n'
+                      'decrypt                          | '
+                      'decrypt a given file or string with the private key stored\n'
+                      'generate private key     -gprik  | '
+                      'generate a private key\n'
+                      'generate public key      -gpubk  | '
+                      'generate a public key based on the stored private key\n'
+                      'import                           | '
+                      'import from a file or string a key\n'
+                      'import key from file     -ikf    | '
+                      'import a key from a file\n'
+                      'import key from str      -iks    | '
+                      'import a key from a string\n'
+                      'export                           | '
+                      'export the selected key to string or file\n'
+                      'print private_key                | '
+                      'print the actual private key stored\n'
+                      'print public_key                 | '
+                      'print the actual public key stored\n'
+                      'exit                         -e          | '
+                      'Exit the programa'
+                      '##############################################################################################\n'
+                      )
+
             case 'encrypt':
                 print("Encrypt file or text input?")
                 match input('=> '):
-
                     case 'file':
                         encrypt_decrypt_mgr.encrypt_file(input('Path =>'), public_key)
 
@@ -47,10 +74,10 @@ def main():
                     case _:
                         print('Selection not valid.\n Returning to main menu...')
 
-            case 'generate private key' | 'gprik':
+            case 'generate private key' | '-gprik':
                 private_key = key_mgr.gen_private_key()
 
-            case 'generate public key' | 'gpubk':
+            case 'generate public key' | '-gpubk':
                 if private_key is None:
                     print('Private key not found')
                     continue
@@ -87,7 +114,7 @@ def main():
                             case _:
                                 print('Selection not valid.\n Returning to main menu...')
 
-            case 'import key from file' | 'ikf':
+            case 'import key from file' | '-ikf':
                 file_directory = input('Input the complete file directory =>')
                 print('save import as private_key or public_key?')
                 match input('=>'):
@@ -98,7 +125,7 @@ def main():
                     case 'public_key':
                         public_key = key_mgr.import_key_from_file(file_directory)
 
-            case 'import key from str' | 'iks':
+            case 'import key from str' | '-iks':
                 str_key_import = input('only Keys in a string = >')
                 print('save import as private_key or public_key?')
                 match input('=>'):
@@ -131,8 +158,12 @@ def main():
             case 'print public_key':
                 print(key_mgr.stringify_key(public_key))
 
+            case 'exit' | '-e':
+                exit()
+
             case _:
-                print('Selection not valid.')
+                print('Selection not valid.\n'
+                      'Type help or -h for help.')
 
 
 if __name__ == '__main__':
