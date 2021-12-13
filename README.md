@@ -6,7 +6,7 @@ This program uses the following libraries to function properly
 - cryptodome
 - chromalog
 
-> pip install cryptodome\
+> pip install pycryptodome\
 > pip install chromalog
 
 ## Setup
