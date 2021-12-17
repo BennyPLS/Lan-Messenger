@@ -29,7 +29,7 @@ def recv(conn: socket, rsa_key: RSA.RsaKey = None):
             msg_length = conn.recv(header).decode(encode_format)
         except ConnectionResetError:
             print('[CLOSED CONNECTION BY SERVER]')
-            return ConnectionResetError
+            return
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(encode_format)

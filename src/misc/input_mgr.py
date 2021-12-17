@@ -51,7 +51,7 @@ def input_port():
             if server_port < 0 or server_port is False:
                 raise ValueError
             elif server_port <= 49151:
-                logger.debug(f'You may be using a port in use or reserved. Port = {server_port}')
+                logger.warning(f'You may be using a port in use or reserved. Port = {server_port}')
             elif server_port >= 65535:
                 raise IndexError
 

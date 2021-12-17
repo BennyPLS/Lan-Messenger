@@ -36,7 +36,7 @@ def initialize_connection(ip, port):
     try:
         conn.connect(address)
     except ConnectionRefusedError:
-        logger.exception('Connection failed to establish')
+        logger.error('Connection failed to establish')
         return None, None, None, None, None
     print(f'############################### \n'
           f'Connection established with \n '
@@ -48,7 +48,6 @@ def initialize_connection(ip, port):
     # public keys, usernames #
 
     send(key_mgr.stringify_key(public_key), conn)
-
     public_key_server = recv(conn)
 
     username = input('Input your username: ')

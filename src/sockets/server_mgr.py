@@ -69,14 +69,12 @@ def listen(server: socket, server_name: str):
     while True:
         try:
             client_conn, client_addr = server.accept()
-            # noinspection PyUnusedLocal
-            client = Thread(target=handle_connection, args=(client_conn, client_addr, server_name)).start()
+            Thread(target=handle_connection, args=(client_conn, client_addr, server_name)).start()
         except OSError:
             print('Server Closed [FORCED]')
             break
 
 
-# noinspection PyTypeChecker
 def handle_connection(conn: socket, addr, server_name: str = 'Server'):
     """This function is the handler of an incoming connection to the server,
     this make the neccesary interchange of info to stablish a encrypted connection"""
@@ -89,7 +87,7 @@ def handle_connection(conn: socket, addr, server_name: str = 'Server'):
 
     username = recv(conn)
     userDict[username] = User(username, addr, conn, public_key)
-
+ 
     send(server_name, conn)
 
     p2p_recive_handler(conn, server_private_key, username)
@@ -144,6 +142,7 @@ def search_public_key_by_username(username):
 
     except KeyError:
         print('There are not a user in the database with that username')
+        return None
 
 
 def search_conn_by_username(username):
@@ -158,3 +157,4 @@ def search_conn_by_username(username):
 
     except KeyError:
         print('There are not a user in the database with that username')
+        return None

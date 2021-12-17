@@ -42,8 +42,8 @@ def main():
                       'print the actual private key stored\n'
                       'print public_key                 | '
                       'print the actual public key stored\n'
-                      'exit                         -e          | '
-                      'Exit the programa'
+                      'exit                         -e  | '
+                      'Exit the program\n'
                       '##############################################################################################\n'
                       )
 
@@ -86,16 +86,16 @@ def main():
 
             case 'import':
                 print('Import from a file or a string?')
-                match input('=>'):
+                match input('=> '):
 
                     case 'string':
-                        print('Import as a private_key or public_key?')
+                        print('Import as a private key or public key?')
                         match input('=>'):
 
-                            case 'private_key':
+                            case 'private key':
                                 private_key = key_mgr.unstringify_key(input('=>'))
 
-                            case 'public_key':
+                            case 'public key':
                                 public_key = key_mgr.unstringify_key(input('=>'))
 
                             case _:
@@ -103,7 +103,7 @@ def main():
 
                     case 'file':
                         print('Import as a private_key or public_key?')
-                        match input('=>'):
+                        match input('=>').lower():
 
                             case 'private_key':
                                 private_key = key_mgr.import_key_from_file(input('Location =>'))
@@ -117,18 +117,18 @@ def main():
             case 'import key from file' | '-ikf':
                 file_directory = input('Input the complete file directory =>')
                 print('save import as private_key or public_key?')
-                match input('=>'):
+                match input('=>').lower():
 
-                    case 'private_key':
+                    case 'private key':
                         private_key = key_mgr.import_key_from_file(file_directory)
 
-                    case 'public_key':
+                    case 'public key':
                         public_key = key_mgr.import_key_from_file(file_directory)
 
             case 'import key from str' | '-iks':
                 str_key_import = input('only Keys in a string = >')
                 print('save import as private_key or public_key?')
-                match input('=>'):
+                match input('=> '):
 
                     case 'private_key':
                         private_key = key_mgr.unstringify_key(str_key_import)
@@ -141,12 +141,12 @@ def main():
 
             case 'export':
                 print('Export Public key or Private key')
-                match input('=>'):
+                match input('=> ').lower():
 
-                    case 'private_key' | 'private':
+                    case 'private key':
                         key_mgr.export_key_to_file(private_key, input('Input the complete file directory =>'))
 
-                    case 'public_key' | 'public':
+                    case 'public key':
                         key_mgr.export_key_to_file(public_key, input('Input the complete file directory =>'))
 
                     case _:

@@ -20,7 +20,7 @@ default_format_logger = ('\n[%(asctime)s] - [File:%(filename)s -> FuncName:%(fun
 
 def reg_logger(
         name: str,
-        level: int = logging.ERROR,
+        level: int = logging.INFO,
         format_msg: str = default_format_logger,
         filename='./logs.log',
         stream_handler: bool = True

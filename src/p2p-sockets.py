@@ -15,7 +15,7 @@ logger = reg_logger(__name__)
 
 
 def main():
-    # Variables #
+    """Main Thread"""
 
     server = None
     conn = None
@@ -28,13 +28,13 @@ def main():
     ''')
     print('\nType help or -h for help.')
     while True:
-        entry = input(" =>")
+        entry = input("=> ")
 
         match entry.lower():
 
             case 'help' | '-h':
 
-                print('##############################################################################################\n'
+                print('######################################################################################\n'
                       'initialize server            -initserv   | '
                       'Initializes the server with the given parameters\n'
                       'connect                      -conn       | '
@@ -45,9 +45,9 @@ def main():
                       'Sends a msg to a specified user connected to your server\n'
                       'stop server                  -clserver   | '
                       'Stop forcefully the socket server\n'
-                      'exit                         -e          | '
+                      'exit -e          | '
                       'Exit the programa\n'
-                      '##############################################################################################\n'
+                      '######################################################################################\n'
                       )
 
             case 'initialize server' | '-initserv':
@@ -83,9 +83,13 @@ def main():
             case 'send msg to a client' | '-smc':
                 username = input('Input the username: ')
                 pubkey_client = server_mgr.search_public_key_by_username(username)
-                conn = server_mgr.search_conn_by_username(username)
-                msg = input('Input Message: ')
-                socket_mgr.send(msg, conn, pubkey_client)
+                conn_server = server_mgr.search_conn_by_username(username)
+                if conn_server is not None and pubkey_client is not None:
+                    msg = input('Input Message: ')
+                    socket_mgr.send(msg, conn_server, pubkey_client)
+                else:
+                    logger.debug(f'')
+                    print(f'{username}, not found in dict ')
 
             case 'Stop Server' | '-clserver':
                 if server:
