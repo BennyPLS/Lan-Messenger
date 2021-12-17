@@ -9,6 +9,7 @@ import Crypto
 from Crypto.PublicKey import RSA
 from chromalog.mark.helpers import simple as sh
 
+from misc.input_mgr import pathvalidation
 from misc.reg_logger import reg_logger
 
 ########################################
@@ -53,22 +54,14 @@ def stringify_key(key: RSA.RsaKey):
 
 
 def export_key_to_file(key: RSA.RsaKey, filename: str or Path):
-    """This function export a key to a file"""
-    if isinstance(filename, str):
-        filename = Path(filename)
-    try:
-        filename.resolve(strict=True)
+    """This function export a key to a file in PEM format"""
+    if not pathvalidation(filename, True):
+        return
 
-        if not filename.is_file() or not filename.parent.is_dir():
-            raise FileNotFoundError
+    with open(filename, 'wb') as f:
+        f.write(key.export_key('PEM'))
 
-        with open(filename, 'wb') as f:
-            f.write(key.export_key('PEM'))
-
-        logger.info(f'Imported key to file, %s', sh.success('successfully'))
-
-    except FileNotFoundError:
-        logger.exception(f"The {filename} doesn't exists")
+    logger.info(f'Imported key to file, %s', sh.success('successfully'))
 
 
 ########################################
@@ -84,18 +77,12 @@ def unstringify_key(key: str):
 
 def import_key_from_file(filename):
     """This function imports a key from a file"""
-    if isinstance(filename, str):
-        filename = Path(filename)
-    try:
-        filename.resolve(strict=True)
+    if not pathvalidation(filename, True):
+        return
 
-        if not filename.is_file() or not filename.parent.is_dir():
-            raise FileNotFoundError
+    with open(filename, 'rb') as f:
+        key = f.read()
+        key = RSA.importKey(key)
+    logger.info(f'Imported key from file, %s', sh.success('successfully'))
+    return key
 
-        with open(filename, 'rb') as f:
-            key = f.read()
-            key = RSA.importKey(key)
-        logger.info(f'Imported key from file, %s', sh.success('successfully'))
-        return key
-    except FileNotFoundError:
-        logger.exception(f"The {filename} doesn't exists")

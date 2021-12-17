@@ -4,7 +4,9 @@
 
 import re  # regular expressions
 
+from chromalog.mark.helpers import simple as sh
 from misc.reg_logger import reg_logger
+from pathlib import Path
 
 ########################################
 #                Logging               #
@@ -61,3 +63,27 @@ def input_port():
             logger.error('The port has to be a positive integer')
         except IndexError:
             logger.error('You exceeded the maximum possible port numbers')
+
+
+def pathvalidation(location: Path or str, parent_comprove: bool = False, strictly: bool = True):
+    if isinstance(location, str):
+        location = Path(location)
+
+    try:
+        location.resolve(strict=strictly)
+
+    except FileNotFoundError:
+        logger.error(f"The {location} could be not resolved strictly")
+        return False
+
+    if parent_comprove:
+        if not location.parent.is_dir():
+            logger.error(f"The {location} could be not resolved strictly")
+            return False
+
+    else:
+        if not location.is_file():
+            logger.error(f"The {location} could be not resolved strictly")
+            return False
+
+    return True

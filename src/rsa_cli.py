@@ -48,28 +48,49 @@ def main():
                       )
 
             case 'encrypt':
-                print("Encrypt file or text input?")
+                if not public_key:
+                    print('There are not public keys available.')
+                    continue
+
+                print("Encrypt text or other?")
                 match input('=> '):
-                    case 'file':
+                    case 'other':
                         encrypt_decrypt_mgr.encrypt_file(input('Path =>'), public_key)
 
                     case 'text':
-                        msg_encoded = encrypt_decrypt_mgr.encrypt_msg(input('Enter msg =>'), public_key)
-                        print(msg_encoded)
+                        print('file or input string?')
+                        match input('=> '):
+
+                            case 'file':
+                                encrypt_decrypt_mgr.encrypt_text_file(input('Path =>'), public_key)
+
+                            case 'file' | 'input' | 'input string' | 'str':
+                                msg_encoded = encrypt_decrypt_mgr.encrypt_msg(input('Enter msg =>'), public_key)
+                                print(msg_encoded)
 
                     case _:
                         print('Selection not valid.\n Returning to main menu...')
 
             case 'decrypt':
-                print("Decrypt file or text input?")
-                match input('=> '):
+                if not private_key:
+                    print('There are not private keys available.')
+                    continue
 
-                    case 'file':
-                        encrypt_decrypt_mgr.decrypt_file(input('Path =>'), private_key)
+                print("Decrypt text or other?")
+                match input('=> '):
+                    case 'other':
+                        encrypt_decrypt_mgr.decrypt_binary(input('Path =>'), public_key)
 
                     case 'text':
-                        msg = encrypt_decrypt_mgr.decrypt_msg(input('Enter encrypted msg =>'), private_key)
-                        print(msg)
+                        print('file or input string?')
+                        match input('=> '):
+
+                            case 'file':
+                                encrypt_decrypt_mgr.decrypt_text_file(input('Path =>'), public_key)
+
+                            case 'file' | 'input' | 'input string' | 'str':
+                                msg_encoded = encrypt_decrypt_mgr.decrypt_msg(input('Enter msg =>'), public_key)
+                                print(msg_encoded)
 
                     case _:
                         print('Selection not valid.\n Returning to main menu...')

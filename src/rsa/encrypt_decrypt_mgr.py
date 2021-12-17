@@ -9,6 +9,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 
 from misc.reg_logger import reg_logger
+from misc.input_mgr import pathvalidation
 
 ########################################
 #                Logging               #
@@ -38,27 +39,34 @@ def encrypt_msg(msg: str, key: RSA.RsaKey):
     return msg
 
 
-def encrypt_file(filename: str or Path, key: RSA.RsaKey):
-    """This function encrypts a file content with the given key"""
-    if isinstance(filename, str):
-        filename = Path(filename)
-    try:
-        filename.resolve(strict=True)
+def encrypt_file(filename: str, key: RSA.RsaKey):
 
-        if not filename.is_file() or not filename.parent.is_dir():
-            raise FileNotFoundError
+    if not pathvalidation(filename):
+        return
 
-        with open(filename, 'rt') as f:
-            text = f.read()
-            text = text.encode(encode_format)
-            cipher = PKCS1_OAEP.new(key)
-            text = cipher.encrypt(text)
+    with open(filename, 'br') as f:
+        binarydump = f.read()
+        cipher = PKCS1_OAEP.new(key)
+        binarydump = cipher.encrypt(binarydump)
 
-        with open(filename, 'wb') as f:
-            f.write(text)
-    
-    except FileNotFoundError:
-        logger.error(f"The {filename} doesn't exists")
+    with open(filename, 'bw') as f:
+        f.write(binarydump)
+
+
+def encrypt_text_file(filename: str or Path, key: RSA.RsaKey):
+    """This function encrypts a file content {Text} with the given key"""
+
+    if not pathvalidation(filename):
+        return
+
+    with open(filename, 'rt') as f:
+        text = f.read()
+        text = text.encode(encode_format)
+        cipher = PKCS1_OAEP.new(key)
+        text = cipher.encrypt(text)
+
+    with open(filename, 'wb') as f:
+        f.write(text)
 
 
 ########################################
@@ -84,25 +92,32 @@ def decrypt_msg(msg: str, key: RSA.RsaKey):
     return msg
 
 
-def decrypt_file(filename: str or Path, key: RSA.RsaKey):
-    """This function decrypt a file content with the given key"""
-    if isinstance(filename, str):
-        filename = Path(filename)
-    try:
-        filename.resolve(strict=True)
-        if not filename.is_file():
-            raise FileNotFoundError
+def decrypt_binary(filename: str or Path, key: RSA.RsaKey):
+    """This function decrypt a file content {binary} with the given key"""
+    if not pathvalidation(filename):
+        return
 
-        with open(filename, 'rb') as f:
-            text = f.read()
-            cipher = PKCS1_OAEP.new(key)
-            text = cipher.decrypt(text)
-            text = str(text)
+    with open(filename, 'rb') as f:
+        binarydump = f.read()
+        cipher = PKCS1_OAEP.new(key)
+        binarydump = cipher.decrypt(binarydump)
 
-        with open(filename, 'wt') as f:
-            text = str(text)
-            text = text[2:-1]
-            f.write(text)
+    with open(filename, 'wb') as f:
+        f.write(binarydump)
 
-    except FileNotFoundError:
-        logger.error(f"The {filename} doesn't exists")
+
+def decrypt_text_file(filename: str or Path, key: RSA.RsaKey):
+    """This function decrypt a file content {Text} with the given key"""
+    if not pathvalidation(filename):
+        return
+
+    with open(filename, 'rb') as f:
+        text = f.read()
+        cipher = PKCS1_OAEP.new(key)
+        text = cipher.decrypt(text)
+        text = str(text)
+
+    with open(filename, 'wt') as f:
+        text = str(text)
+        text = text[2:-1]
+        f.write(text)
