@@ -4,7 +4,6 @@
 
 import re  # regular expressions
 
-from chromalog.mark.helpers import simple as sh
 from misc.reg_logger import reg_logger
 from pathlib import Path
 
@@ -19,12 +18,11 @@ logger = reg_logger(__name__)
 #           Filters & Inputs           #
 ########################################
 
-def input_ip():
+def input_ip(msg='Input a ip with this format {x.x.x.x} \n (Note : Without the keys)'):
     """This function takes the input of the user and checks
     if is correct and return the processed input
     if not try again"""
-    print('Input a ip with this format {x.x.x.x} \n'
-          '(Note : Without the keys) ', end="")
+    print(msg, end="")
     while True:
         ip = input('=> ')
 
@@ -42,12 +40,12 @@ def input_ip():
         return ip
 
 
-def input_port():
+def input_port(msg='Input port number: '):
     """This function takes the input from the user and processed it
     to confirm that the input of the user is a valid port
     if the port is non ephemeral, register a debug log"""
     while True:
-        server_port = input('Input port number: ')
+        server_port = input(msg)
         try:
             server_port = int(server_port)
             if server_port < 0 or server_port is False:
@@ -65,7 +63,8 @@ def input_port():
             logger.error('You exceeded the maximum possible port numbers')
 
 
-def pathvalidation(location: Path or str, parent_comprove: bool = False, strictly: bool = True):
+def path_validation(location: Path or str, parent: bool = False, strictly: bool = True):
+    """This function validates the path passed and checks the conditions passed or the default"""
     if isinstance(location, str):
         location = Path(location)
 
@@ -73,17 +72,17 @@ def pathvalidation(location: Path or str, parent_comprove: bool = False, strictl
         location.resolve(strict=strictly)
 
     except FileNotFoundError:
-        logger.error(f"The {location} could be not resolved strictly")
+        logger.error(f"The Path:{location} could be not resolved strictly")
         return False
 
-    if parent_comprove:
-        if not location.parent.is_dir():
-            logger.error(f"The {location} could be not resolved strictly")
+    if parent:
+        if not location.parent.is_dir() or location.parent == location.anchor:
+            logger.error(f"The Path: {location.parent} location is don't exist or is not directory")
             return False
 
     else:
         if not location.is_file():
-            logger.error(f"The {location} could be not resolved strictly")
+            logger.error(f"The Path :{location} is not a file or not exist")
             return False
 
     return True

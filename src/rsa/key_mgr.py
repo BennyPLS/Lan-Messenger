@@ -9,7 +9,7 @@ import Crypto
 from Crypto.PublicKey import RSA
 from chromalog.mark.helpers import simple as sh
 
-from misc.input_mgr import pathvalidation
+from misc.input_mgr import path_validation
 from misc.reg_logger import reg_logger
 
 ########################################
@@ -55,7 +55,7 @@ def stringify_key(key: RSA.RsaKey):
 
 def export_key_to_file(key: RSA.RsaKey, filename: str or Path):
     """This function export a key to a file in PEM format"""
-    if not pathvalidation(filename, True):
+    if not path_validation(filename, True):
         return
 
     with open(filename, 'wb') as f:
@@ -77,7 +77,7 @@ def unstringify_key(key: str):
 
 def import_key_from_file(filename):
     """This function imports a key from a file"""
-    if not pathvalidation(filename, True):
+    if not path_validation(filename, True):
         return
 
     with open(filename, 'rb') as f:

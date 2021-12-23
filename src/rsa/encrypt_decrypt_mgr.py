@@ -9,7 +9,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 
 from misc.reg_logger import reg_logger
-from misc.input_mgr import pathvalidation
+from misc.input_mgr import path_validation
 
 ########################################
 #                Logging               #
@@ -29,7 +29,9 @@ encode_format = 'utf8'
 ########################################
 
 def encrypt_msg(msg: str, key: RSA.RsaKey):
-    """decrypt an str with the given key"""
+    """decrypt an str with the given key
+    :rtype: object
+    """
     msg = msg.encode(encode_format)
     cipher = PKCS1_OAEP.new(key)
     msg = cipher.encrypt(msg)
@@ -41,22 +43,22 @@ def encrypt_msg(msg: str, key: RSA.RsaKey):
 
 def encrypt_file(filename: str, key: RSA.RsaKey):
 
-    if not pathvalidation(filename):
+    if not path_validation(filename):
         return
 
     with open(filename, 'br') as f:
-        binarydump = f.read()
+        binaries = f.read()
         cipher = PKCS1_OAEP.new(key)
-        binarydump = cipher.encrypt(binarydump)
+        binaries = cipher.encrypt(binaries)
 
     with open(filename, 'bw') as f:
-        f.write(binarydump)
+        f.write(binaries)
 
 
 def encrypt_text_file(filename: str or Path, key: RSA.RsaKey):
     """This function encrypts a file content {Text} with the given key"""
 
-    if not pathvalidation(filename):
+    if not path_validation(filename):
         return
 
     with open(filename, 'rt') as f:
@@ -94,21 +96,21 @@ def decrypt_msg(msg: str, key: RSA.RsaKey):
 
 def decrypt_binary(filename: str or Path, key: RSA.RsaKey):
     """This function decrypt a file content {binary} with the given key"""
-    if not pathvalidation(filename):
+    if not path_validation(filename):
         return
 
     with open(filename, 'rb') as f:
-        binarydump = f.read()
+        binaries = f.read()
         cipher = PKCS1_OAEP.new(key)
-        binarydump = cipher.decrypt(binarydump)
+        binaries = cipher.decrypt(binaries)
 
     with open(filename, 'wb') as f:
-        f.write(binarydump)
+        f.write(binaries)
 
 
 def decrypt_text_file(filename: str or Path, key: RSA.RsaKey):
     """This function decrypt a file content {Text} with the given key"""
-    if not pathvalidation(filename):
+    if not path_validation(filename):
         return
 
     with open(filename, 'rb') as f:

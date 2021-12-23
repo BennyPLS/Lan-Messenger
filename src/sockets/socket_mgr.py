@@ -17,18 +17,21 @@ header = 64
 
 
 ########################################
-#        Basic socket functions        #
+#           Socket functions           #
 ########################################
 
 def recv(conn: socket, rsa_key: RSA.RsaKey = None):
-    """This function handles the recieved data, with the headers of the messages and
-    decrypt the message if a RSA key is provided
+    """This function handles the received data, with the headers of the messages and
+    decrypt the message if an RSA key is provided
     if the decryption gave an error the return is a None"""
     while True:
         try:
             msg_length = conn.recv(header).decode(encode_format)
         except ConnectionResetError:
-            print('[CLOSED CONNECTION BY SERVER]')
+            print('[FORCED CLOSED CONNECTION]')
+            return
+        except ConnectionAbortedError:
+            print('[CLOSED CONNECTION]')
             return
         if msg_length:
             msg_length = int(msg_length)
@@ -41,7 +44,8 @@ def recv(conn: socket, rsa_key: RSA.RsaKey = None):
 
 def send(msg: str, conn: socket, rsa_key: RSA.RsaKey = None):
     """This function handles all the preparation for the message to be sent
-    and encrypts the message if a RSA key is provided"""
+    and encrypts the message if an RSA key is provided"""
+
     if rsa_key:
         msg = encrypt_decrypt_mgr.encrypt_msg(msg, rsa_key)
 
@@ -49,5 +53,8 @@ def send(msg: str, conn: socket, rsa_key: RSA.RsaKey = None):
     msg_length = len(msg)
     send_length = str(msg_length).encode(encode_format)
     send_length += b' ' * (header - len(send_length))
-    conn.send(send_length)
-    conn.send(msg)
+    try:
+        conn.send(send_length)
+        conn.send(msg)
+    except ConnectionResetError:
+        print('[CLOSED CONNECTION]')

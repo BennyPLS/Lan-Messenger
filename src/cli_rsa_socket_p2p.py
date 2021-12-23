@@ -2,10 +2,12 @@
 #                Imports               #
 ########################################
 
-from misc import input_mgr
+from misc.input_mgr import input_ip, input_port
 from misc.reg_logger import reg_logger
 from rsa import key_mgr
-from sockets import server_mgr, client_mgr, socket_mgr
+from sockets import socket_mgr
+from sockets.ServerClass import Server
+from sockets.ClientClass import Client
 
 ########################################
 #                Logging               #
@@ -14,12 +16,15 @@ from sockets import server_mgr, client_mgr, socket_mgr
 logger = reg_logger(__name__)
 
 
+########################################
+#                 Main                 #
+########################################
+
 def main():
     """Main Thread"""
 
+    client = None
     server = None
-    conn = None
-    public_key_server = None
 
     print('''
     ########################################
@@ -45,8 +50,8 @@ def main():
                       'Sends a msg to a specified user connected to your server\n'
                       'stop server                  -clserver   | '
                       'Stop forcefully the socket server\n'
-                      'exit -e          | '
-                      'Exit the programa\n'
+                      'exit                         -e          | '
+                      'Exit the program\n'
                       '######################################################################################\n'
                       )
 
@@ -54,49 +59,41 @@ def main():
                 if server:
                     logger.info('Server already on')
                 else:
-                    server_ip = input_mgr.input_ip()
-                    server_port = input_mgr.input_port()
                     server_name = input('Server name: ')
-                    server, server_private_key, server_thread = \
-                        server_mgr.initialize_server(server_ip, server_port, server_name)
+                    server = Server(server_name)
+                    server_ip = input_ip()
+                    server_port = input_port()
+                    server.initialize(server_ip, server_port)
                     if server:
                         logger.info('Server initialized')
 
             case 'connect' | '-conn':
-                conn_ip = input_mgr.input_ip()
-                conn_port = input_mgr.input_port()
-                conn, username, server_name, conn_private_key, public_key_server = \
-                    client_mgr.initialize_connection(conn_ip, conn_port)
+                conn_ip = input_ip()
+                conn_port = input_port()
+                username = input('Enter username: ')
 
-                if conn:
+                client = Client(username, conn_ip, conn_port)
+                client.initialize_connection()
+
+                if client:
                     logger.info('Successfully established connection')
-                    public_key_server = key_mgr.unstringify_key(public_key_server)
 
             case 'send msg to server' | '-sms':
-                if conn:
+                if client.conn:
                     msg = input('Input Message: ')
 
-                    socket_mgr.send(msg, conn, public_key_server)
+                    client.send_server(msg)
                 else:
                     print('No active connections')
 
             case 'send msg to a client' | '-smc':
-                username = input('Input the username: ')
-                pubkey_client = server_mgr.search_public_key_by_username(username)
-                conn_server = server_mgr.search_conn_by_username(username)
-                if conn_server is not None and pubkey_client is not None:
+                if server:
+                    username = input('Input the username: ')
                     msg = input('Input Message: ')
-                    socket_mgr.send(msg, conn_server, pubkey_client)
-                else:
-                    logger.debug(f'')
-                    print(f'{username}, not found in dict ')
+                    server.send_to_user(username, msg)
 
             case 'Stop Server' | '-clserver':
-                if server:
-                    try:
-                        server.close()
-                    except OSError:
-                        print('Server Closed [FORCED]')
+                server.stop()
 
             case 'exit' | '-e':
                 exit()
