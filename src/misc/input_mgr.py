@@ -18,10 +18,19 @@ logger = reg_logger(__name__)
 #           Filters & Inputs           #
 ########################################
 
-def input_ip(msg='Input a ip with this format {x.x.x.x} \n (Note : Without the keys)'):
-    """This function takes the input of the user and checks
-    if is correct and return the processed input
-    if not try again"""
+def input_ip(
+        msg='Input a ip with this format {x.x.x.x} \n (Note : Without the keys)'
+) -> str:
+    """
+
+    This function takes the user input and returns a valid ip address.
+
+    :param msg:
+      The
+    :type msg: str
+
+    :return:
+    """
     print(msg, end="")
     while True:
         ip = input('=> ')
@@ -40,18 +49,35 @@ def input_ip(msg='Input a ip with this format {x.x.x.x} \n (Note : Without the k
         return ip
 
 
-def input_port(msg='Input port number: '):
-    """This function takes the input from the user and processed it
-    to confirm that the input of the user is a valid port
-    if the port is non ephemeral, register a debug log"""
+def input_port(
+        msg='Input port number: '
+) -> int:
+    """
+
+    This function will take the input of the user and return a valid port number.
+
+    :param msg:
+      This is the message to be print when we ask the user for a port number.
+      Default is ('Input port number: ')
+    :type msg: str
+
+    :return:
+      Returns a valid port number
+    :rtype int:
+
+    """
     while True:
+
         server_port = input(msg)
+
         try:
             server_port = int(server_port)
             if server_port < 0 or server_port is False:
                 raise ValueError
+
             elif server_port <= 49151:
                 logger.warning(f'You may be using a port in use or reserved. Port = {server_port}')
+
             elif server_port >= 65535:
                 raise IndexError
 
@@ -59,12 +85,38 @@ def input_port(msg='Input port number: '):
 
         except ValueError:
             logger.error('The port has to be a positive integer')
+
         except IndexError:
             logger.error('You exceeded the maximum possible port numbers')
 
 
-def path_validation(location: Path or str, parent: bool = False, strictly: bool = True):
-    """This function validates the path passed and checks the conditions passed or the default"""
+def path_validation(
+        location: Path | str,
+        parent: bool = False,
+        strictly: bool = False
+) -> bool:
+    """
+
+    This function checks the given location if exists or if exists the parent directory.
+
+    :param location:
+      The argument is required and is the location to check
+    :type location: Path | str
+
+    :param parent:
+      This option if only check, if the parent directory exists
+    :type parent: bool
+
+    :param strictly:
+      This option if the location is complete.
+    :type strictly: bool
+
+    :return:
+      This return a False if the location does not pass the test to verify, if all the checks return a True.
+    :rtype bool:
+
+    """
+
     if isinstance(location, str):
         location = Path(location)
 

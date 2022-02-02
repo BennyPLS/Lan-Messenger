@@ -10,8 +10,8 @@ from pathlib import Path
 
 from misc.DataClass import User, Chat
 from misc.reg_logger import reg_logger
-from rsa import key_mgr
-from sockets.socket_mgr import recv, send
+from encryption import SimpleRSA, SimpleAES
+from sockets.socket_mgr import recv, send, bind
 
 ########################################
 #                Logging               #
@@ -46,27 +46,25 @@ class Server:
     ########################################
 
     def __init__(self, server_name: str):
+
         self.server_name = server_name
         self.user_dict = {}
-        self.save_path = Path.home().joinpath(f'/RSA saves/{self.server_name}')
+        self.save_path = Path(__file__).parent.resolve().joinpath(f'./Saves/{self.server_name}')
 
         if self.save_path.is_dir():
             pass  # Ask if import all existent info or delete everything.
 
+        else:
+            self.save_path.mkdir()
+
     def initialize(self, ip: str, port: int):
+
         self.address = (ip, port)
 
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket = bind(self.address)
 
-        try:
-            self.server_socket.bind(self.address)
-        except OSError:
-            logger.error('Port in use or not available')
-            return
-
-        self.private_key = key_mgr.gen_private_key()
-        self.public_key = key_mgr.gen_public_key(self.private_key)
+        self.private_key = SimpleRSA.gen_private_key()
+        self.public_key = SimpleRSA.gen_public_key(self.private_key)
 
         print(f'############################### \n'
               f'Started Server at \n'
@@ -78,6 +76,7 @@ class Server:
 
     def listen(self):
         """This function wait for income connection and redirects them to the {handle_connection} function"""
+
         self.server_socket.listen()
         logger.info('Server listening...')
         while True:
@@ -88,29 +87,42 @@ class Server:
                 print('Server Closed [FORCED]')
                 break
 
-    def handle_connection(self, conn: socket, addr, ):
+    def handle_connection(self, conn: socket, addr):
         """This function is the handler of an incoming connection to the server,
         this make the necessary interchange of info to establish an encrypted connection"""
+
         logger.info(f'[NEW CONNECTION] {addr} connected')
 
         public_key = recv(conn)
-        public_key = key_mgr.unstringify_key(public_key)
+        public_key = SimpleRSA.un_stringify_key(public_key)
 
-        send(key_mgr.stringify_key(self.public_key), conn)
+        send(SimpleRSA.stringify_key(self.public_key), conn)
 
-        username = recv(conn, self.private_key)
-        self.user_dict[username] = User(username, addr, conn, public_key)
+        aes_key = SimpleAES.gen_key()
+        send(aes_key, conn)
 
-        send(self.server_name, conn)
+        username = recv(conn, mode='AES', aes_key=aes_key)
 
-        self.recv_handler(conn, username)
+        self.user_dict[username] = User(username, addr, conn, public_key, aes_key)
 
-    def recv_handler(self, conn: socket, client_username: str):
+        send(self.server_name, conn, mode='AES', aes_key=aes_key)
+
+        self.recv_handler(conn, username, aes_key)
+
+    def recv_handler(self, conn: socket, client_username: str, aes_key):
+
         connected = True
         while connected:
-            msg = recv(conn, self.private_key)
+            try:
+                msg = recv(conn, mode='AES', aes_key=aes_key)
 
-            if msg == '!DISCONNECT' or msg is None:
+            except ConnectionResetError as e:
+                return e
+
+            except ConnectionAbortedError as e:
+                return e
+
+            if msg == '!DISCONNECT':
                 connected = False
                 print(f'{client_username} has disconnected')
 
@@ -119,6 +131,7 @@ class Server:
         conn.close()
 
     def stop(self) -> None:
+
         for username_info in self.user_dict.values():
             if username_info.conn is None:
                 continue
@@ -127,8 +140,9 @@ class Server:
             username_info.conn = None
 
     def search_by_username(self, username, *args) -> tuple or None:
+
         """This function search the solicited information of a given user by username"""
-        valid_search_args = ["username", "addr", "conn", "public_key"]
+        valid_search_args = ["username", "addr", "conn", "public_key", "aes_key"]
         search, search_result = [], []
 
         for arg in args:
@@ -153,9 +167,7 @@ class Server:
             return
 
     def send_to_user(self, username, msg):
-        pubkey_client, conn_server = self.search_by_username(username, "public_key", "conn")
-        if conn_server is not None and pubkey_client is not None:
-            send(msg, conn_server, pubkey_client)
 
-    def initialize_chat(self, user1, user2):
-        self.chat_list.append(Chat(self.save_path, len(self.chat_list), user1, user2))
+        aes_key, conn_server = self.search_by_username(username, "aes_key", "conn")
+        if conn_server is not None and aes_key is not None:
+            send(msg, conn_server, mode='AES', aes_key=aes_key)

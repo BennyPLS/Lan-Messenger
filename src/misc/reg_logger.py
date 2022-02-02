@@ -23,7 +23,7 @@ def reg_logger(
         level: int = logging.INFO,
         format_msg: str = default_format_logger,
         filename='./logs.log',
-        stream_handler: bool = True
+        stream_handler: bool = False
 ):
     """This creates a logger with the given parameters
     name, Name of the logger,

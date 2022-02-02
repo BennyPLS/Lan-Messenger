@@ -4,8 +4,6 @@
 
 from misc.input_mgr import input_ip, input_port
 from misc.reg_logger import reg_logger
-from rsa import key_mgr
-from sockets import socket_mgr
 from sockets.ServerClass import Server
 from sockets.ClientClass import Client
 
@@ -56,6 +54,7 @@ def main():
                       )
 
             case 'initialize server' | '-initserv':
+
                 if server:
                     logger.info('Server already on')
                 else:
@@ -68,6 +67,7 @@ def main():
                         logger.info('Server initialized')
 
             case 'connect' | '-conn':
+
                 conn_ip = input_ip()
                 conn_port = input_port()
                 username = input('Enter username: ')
@@ -79,26 +79,40 @@ def main():
                     logger.info('Successfully established connection')
 
             case 'send msg to server' | '-sms':
+
                 if client.conn:
                     msg = input('Input Message: ')
 
                     client.send_server(msg)
+
                 else:
                     print('No active connections')
 
             case 'send msg to a client' | '-smc':
+
                 if server:
                     username = input('Input the username: ')
                     msg = input('Input Message: ')
                     server.send_to_user(username, msg)
 
             case 'Stop Server' | '-clserver':
+
                 server.stop()
 
+            case 'search':
+
+                username = input('Input the username: ')
+                msg = input('Input Message: ')
+                print(server.search_by_username(username, "aes_key", "conn"))
+
+                print(server.user_dict)
+
             case 'exit' | '-e':
+
                 exit()
 
             case _:
+
                 print('No valid option found.\n'
                       'Type help or -h for help.')
 

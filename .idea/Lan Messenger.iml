@@ -5,8 +5,19 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/venvLinux" />
+      <excludeFolder url="file://$MODULE_DIR$/Docs" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (RSA)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/src/GUI" />
+        <option value="$MODULE_DIR$/src/misc" />
+        <option value="$MODULE_DIR$/src/sockets" />
+        <option value="$MODULE_DIR$/src/encryption" />
+      </list>
+    </option>
   </component>
 </module>

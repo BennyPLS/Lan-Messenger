@@ -2,7 +2,7 @@
 #                Imports               #
 ########################################
 
-from rsa import key_mgr, encrypt_decrypt_mgr
+from encryption import SimpleRSA
 
 
 def main():
@@ -55,17 +55,17 @@ def main():
                 print("Encrypt text or other?")
                 match input('=> '):
                     case 'other':
-                        encrypt_decrypt_mgr.encrypt_file(input('Path =>'), public_key)
+                        SimpleRSA.encrypt_file(input('Path =>'), public_key)
 
                     case 'text':
                         print('file or input string?')
                         match input('=> '):
 
                             case 'file':
-                                encrypt_decrypt_mgr.encrypt_text_file(input('Path =>'), public_key)
+                                SimpleRSA.encrypt_text_file(input('Path =>'), public_key)
 
                             case 'file' | 'input' | 'input string' | 'str':
-                                msg_encoded = encrypt_decrypt_mgr.encrypt_msg(input('Enter msg =>'), public_key)
+                                msg_encoded = SimpleRSA.encrypt(input('Enter msg =>'), public_key)
                                 print(msg_encoded)
 
                     case _:
@@ -79,31 +79,31 @@ def main():
                 print("Decrypt text or other?")
                 match input('=> '):
                     case 'other':
-                        encrypt_decrypt_mgr.decrypt_binary(input('Path =>'), public_key)
+                        SimpleRSA.decrypt_file(input('Path =>'), public_key)
 
                     case 'text':
                         print('file or input string?')
                         match input('=> '):
 
                             case 'file':
-                                encrypt_decrypt_mgr.decrypt_text_file(input('Path =>'), public_key)
+                                SimpleRSA.decrypt_text_file(input('Path =>'), public_key)
 
                             case 'file' | 'input' | 'input string' | 'str':
-                                msg_encoded = encrypt_decrypt_mgr.decrypt_msg(input('Enter msg =>'), public_key)
+                                msg_encoded = SimpleRSA.decrypt(input('Enter msg =>'), public_key)
                                 print(msg_encoded)
 
                     case _:
                         print('Selection not valid.\n Returning to main menu...')
 
             case 'generate private key' | '-gprik':
-                private_key = key_mgr.gen_private_key()
+                private_key = SimpleRSA.gen_private_key()
 
             case 'generate public key' | '-gpubk':
                 if private_key is None:
                     print('Private key not found')
                     continue
 
-                public_key = key_mgr.gen_public_key(private_key)
+                public_key = SimpleRSA.gen_public_key(private_key)
 
             case 'import':
                 print('Import from a file or a string?')
@@ -114,10 +114,10 @@ def main():
                         match input('=>'):
 
                             case 'private key':
-                                private_key = key_mgr.unstringify_key(input('=>'))
+                                private_key = SimpleRSA.un_stringify_key(input('=>'))
 
                             case 'public key':
-                                public_key = key_mgr.unstringify_key(input('=>'))
+                                public_key = SimpleRSA.un_stringify_key(input('=>'))
 
                             case _:
                                 print('Selection not valid.\n Returning to main menu...')
@@ -127,10 +127,10 @@ def main():
                         match input('=>').lower():
 
                             case 'private_key':
-                                private_key = key_mgr.import_key_from_file(input('Location =>'))
+                                private_key = SimpleRSA.import_key_from_file(input('Location =>'))
 
                             case 'public_key':
-                                public_key = key_mgr.import_key_from_file(input('Location =>'))
+                                public_key = SimpleRSA.import_key_from_file(input('Location =>'))
 
                             case _:
                                 print('Selection not valid.\n Returning to main menu...')
@@ -141,10 +141,10 @@ def main():
                 match input('=>').lower():
 
                     case 'private key':
-                        private_key = key_mgr.import_key_from_file(file_directory)
+                        private_key = SimpleRSA.import_key_from_file(file_directory)
 
                     case 'public key':
-                        public_key = key_mgr.import_key_from_file(file_directory)
+                        public_key = SimpleRSA.import_key_from_file(file_directory)
 
             case 'import key from str' | '-iks':
                 str_key_import = input('only Keys in a string = >')
@@ -152,10 +152,10 @@ def main():
                 match input('=> '):
 
                     case 'private_key':
-                        private_key = key_mgr.unstringify_key(str_key_import)
+                        private_key = SimpleRSA.un_stringify_key(str_key_import)
 
                     case 'public_key':
-                        public_key = key_mgr.unstringify_key(str_key_import)
+                        public_key = SimpleRSA.un_stringify_key(str_key_import)
 
                     case _:
                         print('Selection not valid.\n Returning to main menu...')
@@ -165,19 +165,19 @@ def main():
                 match input('=> ').lower():
 
                     case 'private key':
-                        key_mgr.export_key_to_file(private_key, input('Input the complete file directory =>'))
+                        SimpleRSA.export_key_to_file(private_key, input('Input the complete file directory =>'))
 
                     case 'public key':
-                        key_mgr.export_key_to_file(public_key, input('Input the complete file directory =>'))
+                        SimpleRSA.export_key_to_file(public_key, input('Input the complete file directory =>'))
 
                     case _:
                         print('Selection not valid.\n Returning to main menu...')
 
             case 'print private_key':
-                print(key_mgr.stringify_key(private_key))
+                print(SimpleRSA.stringify_key(private_key))
 
             case 'print public_key':
-                print(key_mgr.stringify_key(public_key))
+                print(SimpleRSA.stringify_key(public_key))
 
             case 'exit' | '-e':
                 exit()

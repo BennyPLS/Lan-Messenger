@@ -19,5 +19,6 @@ The executable are the following:
 The **p2p-sockets.py** is the standalone implementation of the RSA with sockets, Is capable of encrypted communication 
 with the use of cryptodome and some functions, this is the **Peer to Peer** version.
 
-The **rsa_cli.py** is only the implementation of the RSA. Capable of encrypting and decrypting generated keys and importing & exporting them.
+The rsa_cli.py** is only the implementation of the RSA. Capable of encrypting and decrypting generated keys and importing & exporting them.
 
+This documentation is outdated*****
